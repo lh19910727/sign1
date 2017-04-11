@@ -111,10 +111,10 @@
                 recalc = function () {
                 	var newH = canvas.parentNode.offsetHeight
                 	console.log(newH,oriH);
-                	if(newH != oriH){
-                		console.log("666");
-                		scal = oriH/newH
-                	}
+//              	if(newH != oriH){
+//              		console.log("666");
+//              		scal = oriH/newH
+//              	}
                 var clientWidth = docEl.clientWidth;
                 if (!clientWidth) return;
                 docEl.style.fontSize = 10 * (clientWidth / 375) + 'px';
@@ -160,8 +160,8 @@
 					this.initDraw()
 					this.setCanvasStyle()
 					this.makeTextDN()
-//					this.width = canvas.width
-//					this.height = canvas.height
+					this.width = canvas.width
+					this.height = canvas.height
 				},
 				methods: {
 					isPc() {
@@ -265,6 +265,7 @@
 						this.context.strokeStyle = this.config.lineColor
 					},
 					delate() {
+						console.log(this.width, this.height)
 						this.context.clearRect(0, 0, this.width, this.height)
 					}
 				}
