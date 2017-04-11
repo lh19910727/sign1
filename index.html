@@ -109,6 +109,8 @@
                 var clientWidth = docEl.clientWidth;
                 if (!clientWidth) return;
                 docEl.style.fontSize = 10 * (clientWidth / 375) + 'px';
+                canvas.width = canvas.parentNode.offsetWidth
+					canvas.height = canvas.parentNode.offsetHeight
                 };
             if (!doc.addEventListener) return;
             doc.addEventListener('DOMContentLoaded', recalc, false);
