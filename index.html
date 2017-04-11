@@ -111,11 +111,9 @@
                 recalc = function () {
                 	var newH = canvas.parentNode.offsetHeight
                 	console.log(newH,oriH);
-                	if(newH < oriH){
+                	if(newH != oriH){
                 		console.log("666");
                 		scal = oriH/newH
-                	}else{
-                		scal = 1
                 	}
                 var clientWidth = docEl.clientWidth;
                 if (!clientWidth) return;
