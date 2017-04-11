@@ -102,16 +102,28 @@
 			</div>
 		</div>
 		<script type="text/javascript">
+		 	var scal = 0;
 		 window.__setFontSize__ = (function (doc, win) {
+		 	var onoff = true;
+		 	var oriH = canvas.parentNode.offsetHeight;
             var docEl = doc.documentElement,
                 // resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
                 recalc = function () {
+                	var newH = canvas.parentNode.offsetHeight
+                	console.log(newH,oriH);
+                	if(newH < oriH){
+                		console.log("666");
+                		scal = oriH/newH
+                	}else{
+                		scal = 1
+                	}
                 var clientWidth = docEl.clientWidth;
                 if (!clientWidth) return;
                 docEl.style.fontSize = 10 * (clientWidth / 375) + 'px';
                 	canvas.width = canvas.parentNode.offsetWidth
 					canvas.height = canvas.parentNode.offsetHeight
 //             	 	alert( canvas.width+","+canvas.height )
+					
                 };
             if (!doc.addEventListener) return;
             doc.addEventListener('DOMContentLoaded', recalc, false);
@@ -156,7 +168,7 @@
 				methods: {
 					isPc() {
 						const userAgentInfo = navigator.userAgent
-						console.log(userAgentInfo)
+//						console.log(userAgentInfo)
 						const Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod']
 						let flag = true
 						for(let v = 0; v < Agents.length; v++) {
@@ -219,17 +231,17 @@
 					},
 					// mousedown
 					canvasDown(e) {
-						console.log('canvasDown')
-					canvas.width = canvas.parentNode.offsetWidth
-					canvas.height = canvas.parentNode.offsetHeight
+						console.log(scal)
+//					canvas.width = canvas.parentNode.offsetWidth
+//					canvas.height = canvas.parentNode.offsetHeight
 						this.canvasMoveUse = true
 						const canvasX = e.clientX - e.target.parentNode.offsetLeft
 						const canvasY = e.clientY - e.target.parentNode.offsetTop
 						this.setCanvasStyle()
 							// 清除子路径
 						this.context.beginPath()
-						this.context.moveTo(canvasX, canvasY)
-						console.log('moveTo', canvasX, canvasY)
+						this.context.moveTo(canvasX, canvasY*scal)
+//						console.log('moveTo', canvasX, canvasY)ss
 							// 当前绘图表面状态
 						const preData = this.context.getImageData(0, 0, 600, 400)
 							// 当前绘图表面进栈
