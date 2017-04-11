@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#canvas-drawImage h5,
+			#img-box {
+				display: none;
+			}
+			
+			.disnone {
+				display: none;
+			}
+			
+			#sign_bottom {
+				position: absolute;
+				background: #fff;
+				left: 0;
+				bottom: 0;
+				height: 5rem;
+				width: 100%;
+				border-top: 0.1rem solid #e8e8e8;
+				line-height: 5rem;
+			}
+			
+			#canvas {
+				background-color: #f3f3f3;
+				width: 100%;
+				height: 100%;
+				margin-bottom: 5rem;
+				cursor: crosshair;
+			}
+			
+			#img-box img {
+				border: 0.02rem #cccccc solid;
+				width: 1.8rem;
+				height: 1.2rem;
+				margin: 0.1rem;
+			}
+			body,html{
+				height: 100%;
+			}
+			#wrap {
+				height: 100%;
+				/*margin-top: 100px;*/
+			}
+			.wrap {
+				position: relative;
+				width: 100%;
+				height: 100%;
+				/*border: 0.02rem #585858 solid;*/
+				overflow: hidden;
+			}
+			
+			#text {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -60%);
+				font-size: 1.5rem;
+				color: #999999;
+				/*z-index: -1;*/
+			}
+			
+			#canvas-drawImage,
+			#revoke {
+				width: 12.9rem;
+				text-align: center;
+				font-size: 1.8rem
+			}
+			
+			#canvas-drawImage {
+				height: 5.1rem;
+				float: right;
+				border-left: 0.1rem solid #e8e8e8;
+				background: #159dff;
+				color: #fff;
+				margin-top: -0.1rem;
+			}
+			
+			#revoke {
+				height: 100%;
+				float: left;
+				color: #159dff;
+				border-right: 0.1rem solid #e8e8e8;
+			}
+		</style>
+		<script src="vue.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div class="hq-sign content inner draw" id="wrap">
+			<div class="wrap" @touchstart='canvasDown($event)'>
+				<canvas id="canvas" @mousedown="canvasDown($event)" @mouseup="canvasUp($event)" @mousemove="canvasMove($event)" @touchmove="canvasMove($event)" @touchend="canvasUp($event)"></canvas>
+				<div id="text" :class="{disnone:isDisnone}">签字区域</div>
+				<div id="sign_bottom">
+					<div id="revoke" @click="delate()">清空</div>
+					<div id="canvas-drawImage" @click="getImage()">下一步</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+		 window.__setFontSize__ = (function (doc, win) {
+            var docEl = doc.documentElement,
+                // resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                recalc = function () {
+                var clientWidth = docEl.clientWidth;
+                if (!clientWidth) return;
+                docEl.style.fontSize = 10 * (clientWidth / 375) + 'px';
+                };
+            if (!doc.addEventListener) return;
+            doc.addEventListener('DOMContentLoaded', recalc, false);
+            doc.addEventListener('resize', recalc, false);
+
+            return recalc;
+        })(document, window);
+			new Vue ({
+				el: '#wrap',
+				data() {
+					return {
+						context: {},
+						imgUrl: [],
+						canvasMoveUse: false,
+						isDisnone: false,
+						preDrawAry: [],
+						nextDrawAry: [],
+						middleAry: [],
+						config: {
+							lineWidth: 1,
+							lineColor: '#f2849e',
+							shadowBlur: 2
+						}
+					}
+				},
+
+				mounted() {
+					const canvas = document.querySelector('#canvas')
+					const signBottom = document.querySelector('#sign_bottom')
+					const botHeight = signBottom.offsetHeight
+					canvas.width = canvas.parentNode.offsetWidth
+					canvas.height = canvas.parentNode.offsetHeight
+//					canvas.height = canvas.parentNode.offsetHeight - botHeight
+//					canvas.height = 300
+					this.context = canvas.getContext('2d')
+					this.initDraw()
+					this.setCanvasStyle()
+					this.makeTextDN()
+					this.width = canvas.width
+					this.height = canvas.height
+				},
+				methods: {
+					isPc() {
+						const userAgentInfo = navigator.userAgent
+						console.log(userAgentInfo)
+						const Agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod']
+						let flag = true
+						for(let v = 0; v < Agents.length; v++) {
+							if(userAgentInfo.indexOf(Agents[v]) > 0) {
+								flag = false
+								break
+							}
+						}
+						return flag
+					},
+					makeTextDN() {
+						const _this = this
+						setTimeout(function() {
+							_this.isDisnone = true
+						}, 2000)
+					},
+					removeImg(src) {
+						this.imgUrl = this.imgUrl.filter(item => item !== src)
+					},
+					initDraw() {
+						const preData = this.context.getImageData(0, 0, 600, 400)
+						this.middleAry.push(preData)
+					},
+					canvasMove(e) {
+						if(this.canvasMoveUse) {
+							const t = e.target
+							let canvasX
+							let canvasY
+							if(this.isPc()) {
+								canvasX = e.clientX - t.offsetLeft
+								canvasY = e.clientY - t.offsetTop
+							} else {
+								canvasX = e.changedTouches[0].clientX - t.offsetLeft
+								canvasY = e.changedTouches[0].clientY - t.offsetTop + document.body.scrollTop
+							}
+							this.context.lineTo(canvasX, canvasY)
+							this.context.stroke()
+						}
+						e.preventDefault()
+					},
+					beginPath(e) {
+						const canvas = document.querySelector('#canvas')
+						if(e.target !== canvas) {
+							console.log('beginPath')
+							this.context.beginPath()
+						}
+					},
+					canvasUp(e) {
+						console.log('canvasUp')
+						const preData = this.context.getImageData(0, 0, 600, 400)
+						if(!this.nextDrawAry.length) {
+							this.middleAry.push(preData)
+						} else {
+							this.middleAry = []
+							this.middleAry = this.middleAry.concat(this.preDrawAry)
+							this.middleAry.push(preData)
+							this.nextDrawAry = []
+						}
+						this.canvasMoveUse = false
+					},
+					// mousedown
+					canvasDown(e) {
+						console.log('canvasDown')
+						this.canvasMoveUse = true
+						const canvasX = e.clientX - e.target.parentNode.offsetLeft
+						const canvasY = e.clientY - e.target.parentNode.offsetTop
+						this.setCanvasStyle()
+							// 清除子路径
+						this.context.beginPath()
+						this.context.moveTo(canvasX, canvasY)
+						console.log('moveTo', canvasX, canvasY)
+							// 当前绘图表面状态
+						const preData = this.context.getImageData(0, 0, 600, 400)
+							// 当前绘图表面进栈
+						this.preDrawAry.push(preData)
+					},
+					// 生成图片
+					getImage() {
+						const canvas = document.querySelector('#canvas')
+						const src = canvas.toDataURL('image/png')
+						this.imgUrl.push(src)
+						localStorage.setItem('useUrl', src)
+							//    if (!this.isPc()) {
+							//    // window.open(`data:text/plain,${src}`)
+							//      window.location.href = src
+							//    }
+
+					},
+					// 设置绘画配置
+					setCanvasStyle() {
+						this.context.lineWidth = this.config.lineWidth
+						this.context.shadowBlur = this.config.shadowBlur
+						this.context.shadowColor = this.config.lineColor
+						this.context.strokeStyle = this.config.lineColor
+					},
+					delate() {
+						this.context.clearRect(0, 0, this.width, this.height)
+					}
+				}
+			})
+		</script>
+	</body>
+
+</html>
