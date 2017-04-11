@@ -111,7 +111,7 @@
                 docEl.style.fontSize = 10 * (clientWidth / 375) + 'px';
                 	canvas.width = canvas.parentNode.offsetWidth
 					canvas.height = canvas.parentNode.offsetHeight
-               	 	alert( canvas.width+","+canvas.height )
+//             	 	alert( canvas.width+","+canvas.height )
                 };
             if (!doc.addEventListener) return;
             doc.addEventListener('DOMContentLoaded', recalc, false);
@@ -150,8 +150,8 @@
 					this.initDraw()
 					this.setCanvasStyle()
 					this.makeTextDN()
-					this.width = canvas.width
-					this.height = canvas.height
+//					this.width = canvas.width
+//					this.height = canvas.height
 				},
 				methods: {
 					isPc() {
@@ -220,6 +220,8 @@
 					// mousedown
 					canvasDown(e) {
 						console.log('canvasDown')
+					canvas.width = canvas.parentNode.offsetWidth
+					canvas.height = canvas.parentNode.offsetHeight
 						this.canvasMoveUse = true
 						const canvasX = e.clientX - e.target.parentNode.offsetLeft
 						const canvasY = e.clientY - e.target.parentNode.offsetTop
